@@ -1,0 +1,13 @@
+.error {
+    border: 1px solid red;
+}
+
+.block-label {
+    font-weight: 600;
+}
+.block-content{
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 30px;
+    max-width: 600px;
+}

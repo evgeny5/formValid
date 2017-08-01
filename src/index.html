@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>formValid</title>
+    <meta name="description" content="formValid">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+</head>
+<body>
+
+<div class="pure-g block-content">
+    <div class="pure-u-1">
+        <form class="pure-form pure-form-aligned" action="#" method="post" name="form-valid" id="form-valid">
+            <fieldset>
+                <div class="pure-control-group">
+                    <label for="fio" class="block-label">ФИО</label>
+                    <input id="fio" type="text" placeholder="ФИО" name="fio">
+                    <!--<span class="pure-form-message-inline">This is a required field.</span>-->
+                </div>
+
+                <div class="pure-control-group">
+                    <label for="email" class="block-label">Email</label>
+                    <input id="email" type="email" placeholder="email" name="email">
+                </div>
+
+                <div class="pure-control-group">
+                    <label for="phone" class="block-label">Телефон</label>
+                    <input id="phone" type="text" placeholder="+7(XXX)XXX-XX-XX" name="phone">
+                </div>
+
+                <div class="pure-controls">
+                    <button type="submit" class="pure-button pure-button-primary" id="submitButton">Отправить</button>
+                </div>
+            </fieldset>
+        </form>
+        <div id="resultContainer"></div>
+    </div>
+</div>
+<link rel="stylesheet" href="css/vendor.min.css">
+<link rel="stylesheet" href="css/style.min.css">
+<script src="js/vendor.min.js" defer></script>
+<script src="js/index.min.js" defer></script>
+</body>
+</html>
