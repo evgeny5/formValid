@@ -91,7 +91,6 @@ class LoginForm {
             if (!phoneRegex.test(phone.value)) {
                 ShowError(phone, 'Формат телефона +7(XXX)XXX-XX-XX!');
             }
-
         };
 
         let isValid = true;
