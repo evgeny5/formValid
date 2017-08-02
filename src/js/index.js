@@ -1,34 +1,38 @@
 class LoginForm {
     constructor(formName) {
-        this.formData = {};
         this.formCurrent = document.forms[formName];
+    }
 
+    getData() {
+        let formData = {};
         if (typeof this.formCurrent !== "undefined") {
             const countFormElements = this.formCurrent.elements.length;
 
             for (let i = 0; i < countFormElements; i++) {
                 let elementCurrent = this.formCurrent.elements[i];
                 if (elementCurrent.nodeName.toUpperCase() === 'INPUT') {
-                    this.formData[elementCurrent.name] = $.trim(elementCurrent.value);
+                    formData[elementCurrent.name] = $.trim(elementCurrent.value);
                 }
             }
         }
-    }
-
-    getData() {
-        return this.formData;
+        return formData;
     }
 
     setData(initData) {
+        const fieldsCheck = ["fio", "email", "phone"];
+
+        if (typeof this.formCurrent === "undefined") {
+            return;
+        }
+
         if (typeof initData === "object" && !$.isEmptyObject(initData)) {
-            let setData = new Set(["fio", "email", "phone"]);
+            let setData = new Set(fieldsCheck);
             for (let keyData in initData) {
                 if (!initData.hasOwnProperty(keyData))
                     continue;
 
                 if (setData.has(keyData)) {
                     this.formCurrent.elements[keyData].value = initData[keyData];
-                    this.formData[keyData] = $.trim(initData[keyData]);
                 }
 
             }
@@ -36,6 +40,10 @@ class LoginForm {
     }
 
     validate() {
+        if (typeof this.formCurrent === "undefined") {
+            return;
+        }
+
         let ShowError = (container, errorMessage) => {
             const id = "#" + container.id;
             $(id).addClass('error');
@@ -81,6 +89,8 @@ class LoginForm {
         };
 
         let phoneCheck = () => {
+            const maxSum = 30;
+
             let phone = this.formCurrent.elements.phone;
             if (!phone.value) {
                 ShowError(phone, 'Это поле должно быть заполенно!');
@@ -90,13 +100,21 @@ class LoginForm {
             let phoneRegex = /^\+7\(\d{3}\)\d{3}-\d{2}-\d{2}$/i;
             if (!phoneRegex.test(phone.value)) {
                 ShowError(phone, 'Формат телефона +7(XXX)XXX-XX-XX!');
+                return;
             }
+
+            let resultSum = phone.value.match(/\d/g).reduce((sum, current) => sum + +current, 0);
+            if (resultSum > maxSum) {
+                ShowError(phone, `Сумма цифр телефона превышает ${maxSum}`);
+            }
+
         };
 
         let isValid = true;
         let errorFields = [];
 
         resetError();
+
         fioCheck();
         emailCheck();
         phoneCheck();
@@ -104,16 +122,25 @@ class LoginForm {
         return {isValid, errorFields}
     }
 
+    submit() {
+        let resultValidate = this.validate();
+        if (resultValidate.isValid) {
+            let resultContainer = $('#resultContainer');
+            // $('#resultContainer').fadeIn(1000).delay(2000).fadeOut(1000);
+        }
+    }
 }
 
 $(function () {
+    $('#resultContainer').hide();
+
     window.MyForm = new LoginForm("form-valid");
     // console.log(MyForm.getData());
 
     let initObj = {
         fio: 'Петров Иван Васильевич',
         email: 'petr@ya.ru',
-        phone: '+7(912)952-15-96',
+        phone: '+7(111)222-33-11',
         qwe: '111'
     };
     MyForm.setData(initObj);
@@ -121,6 +148,6 @@ $(function () {
 
     $('#submitButton').click((e) => {
         e.preventDefault();
-        console.log(MyForm.validate());
+        MyForm.submit();
     })
 });

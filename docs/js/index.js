@@ -10,37 +10,41 @@ var LoginForm = function () {
     function LoginForm(formName) {
         _classCallCheck(this, LoginForm);
 
-        this.formData = {};
         this.formCurrent = document.forms[formName];
-
-        if (typeof this.formCurrent !== "undefined") {
-            var countFormElements = this.formCurrent.elements.length;
-
-            for (var i = 0; i < countFormElements; i++) {
-                var elementCurrent = this.formCurrent.elements[i];
-                if (elementCurrent.nodeName.toUpperCase() === 'INPUT') {
-                    this.formData[elementCurrent.name] = $.trim(elementCurrent.value);
-                }
-            }
-        }
     }
 
     _createClass(LoginForm, [{
         key: "getData",
         value: function getData() {
-            return this.formData;
+            var formData = {};
+            if (typeof this.formCurrent !== "undefined") {
+                var countFormElements = this.formCurrent.elements.length;
+
+                for (var i = 0; i < countFormElements; i++) {
+                    var elementCurrent = this.formCurrent.elements[i];
+                    if (elementCurrent.nodeName.toUpperCase() === 'INPUT') {
+                        formData[elementCurrent.name] = $.trim(elementCurrent.value);
+                    }
+                }
+            }
+            return formData;
         }
     }, {
         key: "setData",
         value: function setData(initData) {
+            var fieldsCheck = ["fio", "email", "phone"];
+
+            if (typeof this.formCurrent === "undefined") {
+                return;
+            }
+
             if ((typeof initData === "undefined" ? "undefined" : _typeof(initData)) === "object" && !$.isEmptyObject(initData)) {
-                var setData = new Set(["fio", "email", "phone"]);
+                var setData = new Set(fieldsCheck);
                 for (var keyData in initData) {
                     if (!initData.hasOwnProperty(keyData)) continue;
 
                     if (setData.has(keyData)) {
                         this.formCurrent.elements[keyData].value = initData[keyData];
-                        this.formData[keyData] = $.trim(initData[keyData]);
                     }
                 }
             }
@@ -49,6 +53,10 @@ var LoginForm = function () {
         key: "validate",
         value: function validate() {
             var _this = this;
+
+            if (typeof this.formCurrent === "undefined") {
+                return;
+            }
 
             var ShowError = function ShowError(container, errorMessage) {
                 var id = "#" + container.id;
@@ -95,6 +103,8 @@ var LoginForm = function () {
             };
 
             var phoneCheck = function phoneCheck() {
+                var maxSum = 30;
+
                 var phone = _this.formCurrent.elements.phone;
                 if (!phone.value) {
                     ShowError(phone, 'Это поле должно быть заполенно!');
@@ -104,6 +114,14 @@ var LoginForm = function () {
                 var phoneRegex = /^\+7\(\d{3}\)\d{3}-\d{2}-\d{2}$/i;
                 if (!phoneRegex.test(phone.value)) {
                     ShowError(phone, 'Формат телефона +7(XXX)XXX-XX-XX!');
+                    return;
+                }
+
+                var resultSum = phone.value.match(/\d/g).reduce(function (sum, current) {
+                    return sum + +current;
+                }, 0);
+                if (resultSum > maxSum) {
+                    ShowError(phone, "\u0421\u0443\u043C\u043C\u0430 \u0446\u0438\u0444\u0440 \u0442\u0435\u043B\u0435\u0444\u043E\u043D\u0430 \u043F\u0440\u0435\u0432\u044B\u0448\u0430\u0435\u0442 " + maxSum);
                 }
             };
 
@@ -111,11 +129,21 @@ var LoginForm = function () {
             var errorFields = [];
 
             resetError();
+
             fioCheck();
             emailCheck();
             phoneCheck();
 
             return { isValid: isValid, errorFields: errorFields };
+        }
+    }, {
+        key: "submit",
+        value: function submit() {
+            var resultValidate = this.validate();
+            if (resultValidate.isValid) {
+                var resultContainer = $('#resultContainer');
+                // $('#resultContainer').fadeIn(1000).delay(2000).fadeOut(1000);
+            }
         }
     }]);
 
@@ -123,13 +151,15 @@ var LoginForm = function () {
 }();
 
 $(function () {
+    $('#resultContainer').hide();
+
     window.MyForm = new LoginForm("form-valid");
     // console.log(MyForm.getData());
 
     var initObj = {
         fio: 'Петров Иван Васильевич',
         email: 'petr@ya.ru',
-        phone: '+7(912)952-15-96',
+        phone: '+7(111)222-33-11',
         qwe: '111'
     };
     MyForm.setData(initObj);
@@ -137,6 +167,6 @@ $(function () {
 
     $('#submitButton').click(function (e) {
         e.preventDefault();
-        console.log(MyForm.validate());
+        MyForm.submit();
     });
 });
