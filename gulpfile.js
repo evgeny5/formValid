@@ -46,7 +46,7 @@ gulp.task('js', function () {
             }
         }))
         .pipe(sourcemaps.init())
-        .pipe(babel())
+        .pipe(babel({presets: ['es2015']}))
         .pipe(gulp.dest('docs/js'))
         .pipe(rename({
             suffix: '.min'
