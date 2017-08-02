@@ -19,7 +19,7 @@ var LoginForm = function () {
             for (var i = 0; i < countFormElements; i++) {
                 var elementCurrent = this.formCurrent.elements[i];
                 if (elementCurrent.nodeName.toUpperCase() === 'INPUT') {
-                    this.formData[elementCurrent.name] = elementCurrent.value;
+                    this.formData[elementCurrent.name] = $.trim(elementCurrent.value);
                 }
             }
         }
@@ -40,10 +40,82 @@ var LoginForm = function () {
 
                     if (setData.has(keyData)) {
                         this.formCurrent.elements[keyData].value = initData[keyData];
-                        this.formData[keyData] = initData[keyData];
+                        this.formData[keyData] = $.trim(initData[keyData]);
                     }
                 }
             }
+        }
+    }, {
+        key: "validate",
+        value: function validate() {
+            var _this = this;
+
+            var ShowError = function ShowError(container, errorMessage) {
+                var id = "#" + container.id;
+                $(id).addClass('error');
+                $(id).after("<span class=\"pure-form-message-inline text-error\">" + errorMessage + "</span>");
+                isValid = false;
+                errorFields.push(container.name);
+            };
+
+            var resetError = function resetError() {
+                var idForm = "#" + _this.formCurrent.id;
+                $(idForm).find(".text-error ").remove();
+                $(idForm).find(".error").removeClass("error");
+            };
+
+            var fioCheck = function fioCheck() {
+                var fio = _this.formCurrent.elements.fio;
+                if (!fio.value) {
+                    ShowError(fio, 'Это поле должно быть заполенно!');
+                    return;
+                }
+
+                if ($.trim(fio.value).split(" ").length !== 3) {
+                    ShowError(fio, 'ФИО должно быть ровно 3 слова!');
+                    return;
+                }
+
+                var alphaRegex = /^[А-яёЁ ]+$/i;
+                if (!alphaRegex.test(fio.value)) {
+                    ShowError(fio, 'В ФИО допускаются только русские буквы!');
+                }
+            };
+
+            var emailCheck = function emailCheck() {
+                var email = _this.formCurrent.elements.email;
+                if (!email.value) {
+                    ShowError(email, 'Это поле должно быть заполенно!');
+                    return;
+                }
+                var emailRegex = /^([\w\._]+)@(ya.ru|yandex.ru|yandex.ua|yandex.by|yandex.kz|yandex.com)$/i;
+                if (!emailRegex.test(email.value)) {
+                    ShowError(email, 'Email должен быть из домена Яндекса!');
+                }
+            };
+
+            var phoneCheck = function phoneCheck() {
+                var phone = _this.formCurrent.elements.phone;
+                if (!phone.value) {
+                    ShowError(phone, 'Это поле должно быть заполенно!');
+                    return;
+                }
+
+                var phoneRegex = /^\+7\(\d{3}\)\d{3}-\d{2}-\d{2}$/i;
+                if (!phoneRegex.test(phone.value)) {
+                    ShowError(phone, 'Формат телефона +7(XXX)XXX-XX-XX!');
+                }
+            };
+
+            var isValid = true;
+            var errorFields = [];
+
+            resetError();
+            fioCheck();
+            emailCheck();
+            phoneCheck();
+
+            return { isValid: isValid, errorFields: errorFields };
         }
     }]);
 
@@ -52,7 +124,7 @@ var LoginForm = function () {
 
 $(function () {
     window.MyForm = new LoginForm("form-valid");
-    console.log(MyForm.getData());
+    // console.log(MyForm.getData());
 
     var initObj = {
         fio: 'Петров Иван Васильевич',
@@ -61,5 +133,10 @@ $(function () {
         qwe: '111'
     };
     MyForm.setData(initObj);
-    console.log(MyForm.getData());
+    // console.log(MyForm.getData());
+
+    $('#submitButton').click(function (e) {
+        e.preventDefault();
+        console.log(MyForm.validate());
+    });
 });

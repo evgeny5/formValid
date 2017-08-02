@@ -1,13 +1,18 @@
 .error {
-    border: 1px solid red;
+    border: 1px solid red !important;
+}
+
+.text-error {
+    color: red;
 }
 
 .block-label {
     font-weight: 600;
 }
-.block-content{
+
+.block-content {
     margin-left: auto;
     margin-right: auto;
     padding-top: 30px;
-    max-width: 600px;
+    max-width: 700px;
 }
