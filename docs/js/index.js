@@ -150,7 +150,7 @@ var LoginForm = function () {
                 switch (data.status) {
                     case "success":
                         dataStatus = "success";
-                        statusMsg = "Данные успешно отправлены!";
+                        statusMsg = "Success. Данные успешно отправлены!";
                         break;
                     case "error":
                         dataStatus = "error";
@@ -217,7 +217,7 @@ var LoginForm = function () {
 $(function () {
     $('#resultContainer').hide();
 
-    window.MyForm = new LoginForm("form-valid");
+    window.MyForm = new LoginForm("myForm");
     // console.log(MyForm.getData());
 
     var initObj = {
