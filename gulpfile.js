@@ -45,14 +45,14 @@ gulp.task('js', function () {
                 this.emit('end');
             }
         }))
-        .pipe(sourcemaps.init())
+        // .pipe(sourcemaps.init())
         .pipe(babel({presets: ['es2015']}))
         .pipe(gulp.dest('docs/js'))
         .pipe(rename({
             suffix: '.min'
         }))
         .pipe(uglify())
-        .pipe(sourcemaps.write())
+        // .pipe(sourcemaps.write())
         .pipe(gulp.dest('docs/js'))
         .pipe(reload({stream: true}))
 });

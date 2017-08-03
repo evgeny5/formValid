@@ -296,7 +296,7 @@ $(function () {
 
     //создаем объект нужного класса и делаем его глобальным
     window.MyForm = new LoginForm("myForm");
-    // console.log(MyForm.getData());
+    console.log(MyForm.getData());
 
     //устанавливаем объект с новыми данными
     var initObj = {
@@ -306,7 +306,7 @@ $(function () {
         qwe: '111'
     };
     MyForm.setData(initObj);
-    // console.log(MyForm.getData());
+    console.log(MyForm.getData());
 
     //обработка нажатия на кнопку
     $('#submitButton').click(function (e) {
