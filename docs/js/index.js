@@ -202,7 +202,6 @@ var LoginForm = function () {
             var count = 1;
 
             if (resultValidate.isValid) {
-                console.clear();
                 getService(count);
             }
         }
