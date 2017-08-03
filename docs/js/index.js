@@ -187,9 +187,12 @@ var LoginForm = function () {
                                 return getService(count);
                             }, parseInt(data.timeout) * 1000);
                         }
+                    } else {
+                        $("#submitButton").removeClass('pure-button-disabled');
                     }
                 }).fail(function () {
-                    return showMessage("error", "Ошибка получения данных!");
+                    showMessage("error", "Ошибка получения данных!");
+                    $("#submitButton").removeClass('pure-button-disabled');
                 });
             };
 
@@ -202,6 +205,7 @@ var LoginForm = function () {
             var count = 1;
 
             if (resultValidate.isValid) {
+                $("#submitButton").addClass('pure-button-disabled');
                 getService(count);
             }
         }
