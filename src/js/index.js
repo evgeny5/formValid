@@ -34,7 +34,6 @@ class LoginForm {
                 if (setData.has(keyData)) {
                     this.formCurrent.elements[keyData].value = initData[keyData];
                 }
-
             }
         }
     }
@@ -45,9 +44,7 @@ class LoginForm {
         }
 
         let ShowError = (container, errorMessage) => {
-            const id = "#" + container.id;
-            $(id).addClass('error');
-            $(id).after(`<span class="pure-form-message-inline text-error">${errorMessage}</span>`);
+            $("#" + container.id).addClass('error').after(`<span class="pure-form-message-inline text-error">${errorMessage}</span>`);
             isValid = false;
             errorFields.push(container.name);
         };
@@ -123,10 +120,69 @@ class LoginForm {
     }
 
     submit() {
+        let showMessage = (typeMessage, textMessage) => {
+            $('#resultContainer').removeClass().addClass('alert alert-' + typeMessage).text(textMessage).fadeIn(1000).delay(2000).fadeOut(1000);
+        };
+
+        let switchMessage = (data) => {
+            let statusMsg = '';
+            let dataStatus = '';
+
+            switch (data.status) {
+                case "success":
+                    dataStatus = "success";
+                    statusMsg = "Данные успешно отправлены!";
+                    break;
+                case "error":
+                    dataStatus = "error";
+                    statusMsg = data.reason;
+                    break;
+                case "progress":
+                    dataStatus = "progress";
+                    statusMsg = `Данные обрабатываются. Повтор через ${data.timeout} секунд!`;
+                    break;
+                default:
+                    dataStatus = "error";
+                    statusMsg = 'Ошибка структуры данных! Обратитесь к системному администратору!';
+                    break;
+
+            }
+            showMessage(dataStatus, statusMsg);
+        };
+
+        let getService = (count) => {
+            const jsonFilename = ["error.json", "progress.json", "success.json"];
+            const idForm = $("#" + this.formCurrent.id);
+            let actionUrl = idForm.attr('action') + jsonFilename[Math.floor(Math.random() * jsonFilename.length)];
+
+            return $.ajax({
+                url: actionUrl,
+                type: 'get',
+                dataType: 'json',
+                data: idForm.serialize()
+            })
+                .done((data) => {
+                    switchMessage(data);
+                    if (data.status === "progress") {
+                        if (++count <= maxCount) {
+                            setTimeout(() => getService(count), parseInt(data.timeout) * 1000);
+                        }
+                    }
+                })
+                .fail(() => showMessage("error", "Ошибка получения данных!"));
+        };
+
+        if (typeof this.formCurrent === "undefined") {
+            return;
+        }
+
         let resultValidate = this.validate();
+        const maxCount = 7;
+        let count = 1;
+
         if (resultValidate.isValid) {
-            let resultContainer = $('#resultContainer');
-            // $('#resultContainer').fadeIn(1000).delay(2000).fadeOut(1000);
+            console.clear();
+            getService(count);
         }
     }
 }

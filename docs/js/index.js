@@ -59,9 +59,7 @@ var LoginForm = function () {
             }
 
             var ShowError = function ShowError(container, errorMessage) {
-                var id = "#" + container.id;
-                $(id).addClass('error');
-                $(id).after("<span class=\"pure-form-message-inline text-error\">" + errorMessage + "</span>");
+                $("#" + container.id).addClass('error').after("<span class=\"pure-form-message-inline text-error\">" + errorMessage + "</span>");
                 isValid = false;
                 errorFields.push(container.name);
             };
@@ -139,10 +137,73 @@ var LoginForm = function () {
     }, {
         key: "submit",
         value: function submit() {
+            var _this2 = this;
+
+            var showMessage = function showMessage(typeMessage, textMessage) {
+                $('#resultContainer').removeClass().addClass('alert alert-' + typeMessage).text(textMessage).fadeIn(1000).delay(2000).fadeOut(1000);
+            };
+
+            var switchMessage = function switchMessage(data) {
+                var statusMsg = '';
+                var dataStatus = '';
+
+                switch (data.status) {
+                    case "success":
+                        dataStatus = "success";
+                        statusMsg = "Данные успешно отправлены!";
+                        break;
+                    case "error":
+                        dataStatus = "error";
+                        statusMsg = data.reason;
+                        break;
+                    case "progress":
+                        dataStatus = "progress";
+                        statusMsg = "\u0414\u0430\u043D\u043D\u044B\u0435 \u043E\u0431\u0440\u0430\u0431\u0430\u0442\u044B\u0432\u0430\u044E\u0442\u0441\u044F. \u041F\u043E\u0432\u0442\u043E\u0440 \u0447\u0435\u0440\u0435\u0437 " + data.timeout + " \u0441\u0435\u043A\u0443\u043D\u0434!";
+                        break;
+                    default:
+                        dataStatus = "error";
+                        statusMsg = 'Ошибка структуры данных! Обратитесь к системному администратору!';
+                        break;
+
+                }
+                showMessage(dataStatus, statusMsg);
+            };
+
+            var getService = function getService(count) {
+                var jsonFilename = ["error.json", "progress.json", "success.json"];
+                var idForm = $("#" + _this2.formCurrent.id);
+                var actionUrl = idForm.attr('action') + jsonFilename[Math.floor(Math.random() * jsonFilename.length)];
+
+                return $.ajax({
+                    url: actionUrl,
+                    type: 'get',
+                    dataType: 'json',
+                    data: idForm.serialize()
+                }).done(function (data) {
+                    switchMessage(data);
+                    if (data.status === "progress") {
+                        if (++count <= maxCount) {
+                            setTimeout(function () {
+                                return getService(count);
+                            }, parseInt(data.timeout) * 1000);
+                        }
+                    }
+                }).fail(function () {
+                    return showMessage("error", "Ошибка получения данных!");
+                });
+            };
+
+            if (typeof this.formCurrent === "undefined") {
+                return;
+            }
+
             var resultValidate = this.validate();
+            var maxCount = 7;
+            var count = 1;
+
             if (resultValidate.isValid) {
-                var resultContainer = $('#resultContainer');
-                // $('#resultContainer').fadeIn(1000).delay(2000).fadeOut(1000);
+                console.clear();
+                getService(count);
             }
         }
     }]);
